@@ -29,7 +29,9 @@ class CardRank:
     }
 
     def valid_deck_leader_ranks():
-        return RANK_LIST
+        valid_leader_ranks = CardRank.RANK_LIST.copy()
+        del valid_leader_ranks['NCO']
+        return valid_leader_ranks
 
 DECK_SIZE = 40
 STARTER_DECK_OFFSET = 0x2A0A70
@@ -355,7 +357,7 @@ class DeckEditorMainWindow(QMainWindow):
         self.leader_rank_layout = QHBoxLayout(self.leader_rank_layout_widget)
         self.leader_rank_label = QLabel('Deck Leader Rank:')
         self.combobox_leader_rank = QComboBox (self.leader_rank_layout_widget)
-        self.combobox_leader_rank.addItems(list(CardRank.RANK_LIST.keys()))
+        self.combobox_leader_rank.addItems(list(CardRank.valid_deck_leader_ranks().keys()))
 
         self.leader_rank_layout.addWidget(self.leader_rank_label)
         self.leader_rank_layout.addWidget(self.combobox_leader_rank)
