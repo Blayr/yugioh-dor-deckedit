@@ -320,21 +320,30 @@ class DeckEditorMainWindow(QMainWindow):
         # Right panel / Selected deck edit panel
         self.vertLayoutWidget = QWidget(self.centralwidget)
         self.verticalLayout = QVBoxLayout(self.vertLayoutWidget)
+
+        # Row 1
         self.button_set_deck = QPushButton(self.centralwidget)
         self.button_set_deck.setText("Set Deck")
 
-        self.leader_layoutwidget = QWidget(self.centralwidget)
-        self.leader_layout = QHBoxLayout(self.leader_layoutwidget)
-        self.leader_layoutwidget.setLayout(self.leader_layout)
-        self.lineedit_leader = QLineEdit(self.centralwidget)
+        # Row 2
+        self.leader_name_layout_widget = QWidget(self.centralwidget)
+        self.leader_layout = QHBoxLayout(self.leader_name_layout_widget)
+        self.leader_name_layout_widget.setLayout(self.leader_layout)
+        self.leader_label = QLabel('Deck Leader:', self.leader_name_layout_widget)
+        self.leader_layout.addWidget(self.leader_label)
+        self.lineedit_leader = QLineEdit(self.leader_name_layout_widget)
         self.lineedit_leader.setCompleter(QCompleter(CARD_NAME_LIST))
-
         self.leader_layout.addWidget(self.lineedit_leader)
 
-        self.lineedit_leader_rank = QLineEdit(self.centralwidget)
+        # Row 3
+        self.leader_rank_layout_widget = QWidget(self.centralwidget)
+        self.leader_rank_layout = QHBoxLayout(self.leader_rank_layout_widget)
+        self.leader_rank_label = QLabel('Deck Leader Rank:')
+        self.lineedit_leader_rank = QLineEdit(self.leader_rank_layout_widget)
+        self.leader_rank_layout.addWidget(self.leader_rank_label)
+        self.leader_rank_layout.addWidget(self.lineedit_leader_rank)
 
-        for widget in (self.button_set_deck, self.leader_layoutwidget, self.lineedit_leader_rank):
-            self.verticalLayout.addWidget(widget)
+        # Row 4
         self.cards_scroll = QScrollArea(self.centralwidget)
         self.cards_scroll.setWidgetResizable(True)
 
@@ -361,7 +370,9 @@ class DeckEditorMainWindow(QMainWindow):
 
             self.cards_vertical.addWidget(layoutwidget)
 
-        self.verticalLayout.addWidget(self.cards_scroll)
+        # Add rows to parent widget
+        for widget in (self.button_set_deck, self.leader_name_layout_widget, self.leader_rank_layout_widget, self.cards_scroll):
+            self.verticalLayout.addWidget(widget)
         self.horizontalLayout.addWidget(self.vertLayoutWidget)
 
     def setup_ui(self):
