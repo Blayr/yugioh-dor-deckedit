@@ -199,8 +199,7 @@ class DeckEditorMainWindow(QMainWindow):
                     current.setText("[CPU] {0:>7} [rank:{1:>2}] {2}".format(leaderdata&0xFFF,
                                                                             rank, get_name(leaderdata & 0xFFF)))
 
-                self.leader_label.setText(get_name(leaderdata & 0xFFF))
-                self.lineedit_leader.setText(str(leaderdata & 0xFFF))
+                self.lineedit_leader.setText(get_name(leaderdata & 0xFFF))
 
 
                 print(len(deck_data))
@@ -227,9 +226,8 @@ class DeckEditorMainWindow(QMainWindow):
                 rank = leader >> 12
                 leader_card = leader & 0xFFF
 
-                self.lineedit_leader.setText(str(leader_card))
+                self.lineedit_leader.setText(get_name(leader_card))
                 self.lineedit_leader_rank.setText(str(rank))
-                self.leader_label.setText(get_name(leader_card))
 
                 for i in range(DECK_SIZE):
                     card = struct.unpack_from("H", self.deck_data, current.number*41*2 + 2 + i*2)[0] & 0xFFF
@@ -318,6 +316,56 @@ class DeckEditorMainWindow(QMainWindow):
         else:
             pass # no level loaded, do nothing
 
+    def setup_right_panel(self):
+        # Right panel / Selected deck edit panel
+        self.vertLayoutWidget = QWidget(self.centralwidget)
+        self.verticalLayout = QVBoxLayout(self.vertLayoutWidget)
+        self.button_set_deck = QPushButton(self.centralwidget)
+        self.button_set_deck.setText("Set Deck")
+
+        self.leader_layoutwidget = QWidget(self.centralwidget)
+        self.leader_layout = QHBoxLayout(self.leader_layoutwidget)
+        self.leader_layoutwidget.setLayout(self.leader_layout)
+        self.lineedit_leader = QLineEdit(self.centralwidget)
+        lineedit_leader_completer = QCompleter(CARD_NAME_LIST)
+        self.lineedit_leader.setCompleter(lineedit_leader_completer)
+
+        self.leader_layout.addWidget(self.lineedit_leader)
+
+        self.lineedit_leader_rank = QLineEdit(self.centralwidget)
+
+        for widget in (self.button_set_deck, self.leader_layoutwidget, self.lineedit_leader_rank):
+            self.verticalLayout.addWidget(widget)
+        self.cards_scroll = QScrollArea(self.centralwidget)
+        self.cards_scroll.setWidgetResizable(True)
+
+        self.card_slots = []
+        self.cards_verticalWidget = QWidget(self.centralwidget)
+
+        self.cards_vertical = QVBoxLayout(self.centralwidget)
+        self.cards_verticalWidget.setLayout(self.cards_vertical)
+        self.cards_scroll.setWidget(self.cards_verticalWidget)
+
+        for i in range(DECK_SIZE):
+            layoutwidget = QWidget(self.centralwidget)
+            layout = QHBoxLayout(layoutwidget)
+            layoutwidget.setLayout(layout)
+
+            index_text = QLabel(self.centralwidget)
+            index_text.setText("{0:>2}".format(i))
+            textedit = QLineEdit(self.centralwidget)
+            textedit_completer = QCompleter(CARD_NAME_LIST)
+            textedit.setCompleter(textedit_completer)
+
+            layout.addWidget(index_text)
+            layout.addWidget(textedit)
+            self.card_slots.append((textedit, index_text, layout, layoutwidget))
+
+            self.cards_vertical.addWidget(layoutwidget)
+
+        self.verticalLayout.addWidget(self.cards_scroll)
+        self.horizontalLayout.addWidget(self.vertLayoutWidget)
+
     def setup_ui(self):
         self.setObjectName("MainWindow")
         self.resize(820, 760)
@@ -334,56 +382,7 @@ class DeckEditorMainWindow(QMainWindow):
         self.deck_list = QListWidget(self.centralwidget)
         self.horizontalLayout.addWidget(self.deck_list)
 
-        self.vertLayoutWidget = QWidget(self.centralwidget)
-        self.verticalLayout = QVBoxLayout(self.vertLayoutWidget)
-        self.button_set_deck = QPushButton(self.centralwidget)
-
-        self.button_set_deck.setText("Set Deck")
-
-        self.leader_layoutwidget = QWidget(self.centralwidget)
-        self.leader_layout = QHBoxLayout(self.leader_layoutwidget)
-        self.leader_layoutwidget.setLayout(self.leader_layout)
-        self.lineedit_leader = QLineEdit(self.centralwidget)
-        self.leader_label = QLabel(self.centralwidget)
-
-        self.leader_layout.addWidget(self.lineedit_leader)
-        self.leader_layout.addWidget(self.leader_label)
-
-        self.lineedit_leader_rank = QLineEdit(self.centralwidget)
-
-        for widget in (self.button_set_deck, self.leader_layoutwidget, self.lineedit_leader_rank):
-            self.verticalLayout.addWidget(widget)
-        self.cards_scroll = QScrollArea(self.centralwidget)
-        self.cards_scroll.setWidgetResizable(True)
-
-        self.card_slots = []
-        self.cards_verticalWidget = QWidget(self.centralwidget)
-
-        self.cards_vertical = QVBoxLayout(self.centralwidget)
-        self.cards_verticalWidget.setLayout(self.cards_vertical)
-        self.cards_scroll.setWidget(self.cards_verticalWidget)
-
-        card_name_list = list(CARDS.values())
-
-        for i in range(DECK_SIZE):
-            layoutwidget = QWidget(self.centralwidget)
-            layout = QHBoxLayout(layoutwidget)
-            layoutwidget.setLayout(layout)
-
-            index_text = QLabel(self.centralwidget)
-            index_text.setText("{0:>2}".format(i))
-            textedit = QLineEdit(self.centralwidget)
-            textedit_completer = QCompleter(card_name_list)
-            textedit.setCompleter(textedit_completer)
-
-            layout.addWidget(index_text)
-            layout.addWidget(textedit)
-            self.card_slots.append((textedit, index_text, layout, layoutwidget))
-
-            self.cards_vertical.addWidget(layoutwidget)
-
-        self.verticalLayout.addWidget(self.cards_scroll)
-        self.horizontalLayout.addWidget(self.vertLayoutWidget)
+        self.setup_right_panel();
 
         self.menubar = self.menuBar()
         self.file_menu = self.menubar.addMenu("File")
