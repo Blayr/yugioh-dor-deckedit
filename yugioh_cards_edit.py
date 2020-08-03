@@ -7,7 +7,7 @@ from PyQt5.QtCore import QSize, QRect, QMetaObject, QCoreApplication
 from PyQt5.QtWidgets import (QWidget, QMainWindow, QFileDialog,
                              QSpacerItem, QLabel, QPushButton, QSizePolicy, QVBoxLayout, QHBoxLayout,
                              QScrollArea, QGridLayout, QMenuBar, QMenu, QAction, QApplication, QStatusBar, QListWidget,
-                             QLineEdit, QTextEdit, QListWidgetItem)
+                             QLineEdit, QTextEdit, QListWidgetItem, QCompleter)
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtCore as QtCore
 
@@ -16,15 +16,23 @@ STARTER_DECK_OFFSET = 0x2A0A70
 CPU_DECK_OFFSET = 0x2A1316
 
 CARDS = {}
-try:
-    with open("cardlist.txt", "r") as f:
-        for i, card in enumerate(f):
-            trimmed_card = card.strip()
-            assert trimmed_card != ""
-            CARDS[i] = trimmed_card
-except:
-    traceback.print_exc()
-    CARDS = None # I guess we can't show card names then.
+CARD_NAME_LIST = []
+
+def load_card_list():
+    global CARDS
+
+    try:
+        with open("cardlist.txt", "r") as f:
+            for i, card in enumerate(f):
+                trimmed_card = card.strip()
+                assert trimmed_card != ""
+                CARDS[i] = trimmed_card
+    except:
+        traceback.print_exc()
+        CARDS = None # I guess we can't show card names then.
+
+    global CARD_NAME_LIST
+    CARD_NAME_LIST = list(CARDS.values())
 
 def get_name(card_id):
     if CARDS is None:
@@ -359,6 +367,8 @@ class DeckEditorMainWindow(QMainWindow):
         self.cards_verticalWidget.setLayout(self.cards_vertical)
         self.cards_scroll.setWidget(self.cards_verticalWidget)
 
+        card_name_list = list(CARDS.values())
+
         for i in range(DECK_SIZE):
             layoutwidget = QWidget(self.centralwidget)
             layout = QHBoxLayout(layoutwidget)
@@ -369,6 +379,9 @@ class DeckEditorMainWindow(QMainWindow):
             textedit = QLineEdit(self.centralwidget)
             textedit.setMinimumSize(20, 20)
             textedit.setMaximumSize(100, 5000)
+            textedit_completer = QCompleter(card_name_list)
+            textedit.setCompleter(textedit_completer)
+
             card_name_text = QLabel(self.centralwidget)
             card_name_text.setText("---")
             card_name_text.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
@@ -405,9 +418,9 @@ class DeckEditorMainWindow(QMainWindow):
 if __name__ == "__main__":
     import sys
 
+    load_card_list();
+
     app = QApplication(sys.argv)
-
-
     bw_gui = DeckEditorMainWindow()
 
     bw_gui.show()
