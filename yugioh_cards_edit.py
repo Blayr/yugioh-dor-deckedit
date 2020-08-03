@@ -327,8 +327,7 @@ class DeckEditorMainWindow(QMainWindow):
         self.leader_layout = QHBoxLayout(self.leader_layoutwidget)
         self.leader_layoutwidget.setLayout(self.leader_layout)
         self.lineedit_leader = QLineEdit(self.centralwidget)
-        lineedit_leader_completer = QCompleter(CARD_NAME_LIST)
-        self.lineedit_leader.setCompleter(lineedit_leader_completer)
+        self.lineedit_leader.setCompleter(QCompleter(CARD_NAME_LIST))
 
         self.leader_layout.addWidget(self.lineedit_leader)
 
@@ -354,8 +353,7 @@ class DeckEditorMainWindow(QMainWindow):
             index_text = QLabel(self.centralwidget)
             index_text.setText("{0:>2}".format(i))
             textedit = QLineEdit(self.centralwidget)
-            textedit_completer = QCompleter(CARD_NAME_LIST)
-            textedit.setCompleter(textedit_completer)
+            textedit.setCompleter(QCompleter(CARD_NAME_LIST))
 
             layout.addWidget(index_text)
             layout.addWidget(textedit)
