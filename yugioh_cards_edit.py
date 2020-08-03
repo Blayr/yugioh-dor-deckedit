@@ -130,6 +130,7 @@ class DeckEditorMainWindow(QMainWindow):
     def action_button_set_deck(self):
         print("I was pressed")
         current = self.deck_list.currentItem()
+
         self.statusbar.clearMessage()
         if current is not None and self.deck_data is not None:
             try:
@@ -165,16 +166,15 @@ class DeckEditorMainWindow(QMainWindow):
 
                 deck_data.append(leaderdata)
 
-                cards = []
                 for i in range(DECK_SIZE):
-                    textedit, indexlabel, cardname = self.card_slots[i][0:3]
+                    textedit, indexlabel = self.card_slots[i][0:2]
 
                     card = textedit.text()
                     if card.isnumeric():
                         card = int(card) & 0xFFF
                         deck_data.append(card)
                     else:
-                        match = match_partly(card)
+                        match = match_name(card)
 
                         if isinstance(match, tuple) and match[0] is None:
                             self.statusbar.showMessage("No matching card found: '{0}'".format(card))
@@ -206,9 +206,8 @@ class DeckEditorMainWindow(QMainWindow):
                 print(len(deck_data))
                 for i in range(DECK_SIZE):
                     card = deck_data[1+i]
-                    textedit, indexlabel, cardname = self.card_slots[i][0:3]
-                    textedit.setText(str(card))
-                    cardname.setText(get_name(card))
+                    textedit, indexlabel = self.card_slots[i][0:2]
+                    textedit.setText(get_name(card))
 
                 print(type(self.deck_data))
                 struct.pack_into("H"*41, self.deck_data, current.number*41*2, *deck_data)
@@ -235,12 +234,9 @@ class DeckEditorMainWindow(QMainWindow):
                 for i in range(DECK_SIZE):
                     card = struct.unpack_from("H", self.deck_data, current.number*41*2 + 2 + i*2)[0] & 0xFFF
 
-                    textedit, indexlabel, cardname = self.card_slots[i][0:3]
+                    textedit, indexlabel = self.card_slots[i][0:2]
 
-                    textedit.setText(str(card))
-
-                    cardname.setText(get_name(card))
-
+                    textedit.setText(get_name(card))
         except:
             traceback.print_exc()
             raise
@@ -377,19 +373,12 @@ class DeckEditorMainWindow(QMainWindow):
             index_text = QLabel(self.centralwidget)
             index_text.setText("{0:>2}".format(i))
             textedit = QLineEdit(self.centralwidget)
-            textedit.setMinimumSize(20, 20)
-            textedit.setMaximumSize(100, 5000)
             textedit_completer = QCompleter(card_name_list)
             textedit.setCompleter(textedit_completer)
 
-            card_name_text = QLabel(self.centralwidget)
-            card_name_text.setText("---")
-            card_name_text.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-
             layout.addWidget(index_text)
             layout.addWidget(textedit)
-            layout.addWidget(card_name_text)
-            self.card_slots.append((textedit, index_text, card_name_text, layout, layoutwidget))
+            self.card_slots.append((textedit, index_text, layout, layoutwidget))
 
             self.cards_vertical.addWidget(layoutwidget)
 
