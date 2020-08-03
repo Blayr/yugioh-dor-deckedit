@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QWidget, QMainWindow, QFileDialog,
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtCore as QtCore
 
-
+DECK_SIZE = 40
 STARTER_DECK_OFFSET = 0x2A0A70
 CPU_DECK_OFFSET = 0x2A1316
 
@@ -158,7 +158,7 @@ class DeckEditorMainWindow(QMainWindow):
                 deck_data.append(leaderdata)
 
                 cards = []
-                for i in range(40):
+                for i in range(DECK_SIZE):
                     textedit, indexlabel, cardname = self.card_slots[i][0:3]
 
                     card = textedit.text()
@@ -196,7 +196,7 @@ class DeckEditorMainWindow(QMainWindow):
 
 
                 print(len(deck_data))
-                for i in range(40):
+                for i in range(DECK_SIZE):
                     card = deck_data[1+i]
                     textedit, indexlabel, cardname = self.card_slots[i][0:3]
                     textedit.setText(str(card))
@@ -224,7 +224,7 @@ class DeckEditorMainWindow(QMainWindow):
                 self.lineedit_leader_rank.setText(str(rank))
                 self.leader_label.setText(get_name(leader_card))
 
-                for i in range(40):
+                for i in range(DECK_SIZE):
                     card = struct.unpack_from("H", self.deck_data, current.number*41*2 + 2 + i*2)[0] & 0xFFF
 
                     textedit, indexlabel, cardname = self.card_slots[i][0:3]
@@ -359,7 +359,7 @@ class DeckEditorMainWindow(QMainWindow):
         self.cards_verticalWidget.setLayout(self.cards_vertical)
         self.cards_scroll.setWidget(self.cards_verticalWidget)
 
-        for i in range(40):
+        for i in range(DECK_SIZE):
             layoutwidget = QWidget(self.centralwidget)
             layout = QHBoxLayout(layoutwidget)
             layoutwidget.setLayout(layout)
