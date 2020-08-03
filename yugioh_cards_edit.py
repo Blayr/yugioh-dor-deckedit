@@ -158,8 +158,6 @@ class DeckEditorMainWindow(QMainWindow):
             try:
                 leader, rank = self.lineedit_leader.text(), CardRank.RANK_LIST[self.combobox_leader_rank.currentText()]
 
-                print('blair currentText', self.combobox_leader_rank.currentText(), CardRank.RANK_LIST[self.combobox_leader_rank.currentText()])
-
                 deck_data = []
 
                 if leader.isnumeric():
