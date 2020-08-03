@@ -7,9 +7,29 @@ from PyQt5.QtCore import QSize, QRect, QMetaObject, QCoreApplication
 from PyQt5.QtWidgets import (QWidget, QMainWindow, QFileDialog,
                              QSpacerItem, QLabel, QPushButton, QSizePolicy, QVBoxLayout, QHBoxLayout,
                              QScrollArea, QGridLayout, QMenuBar, QMenu, QAction, QApplication, QStatusBar, QListWidget,
-                             QLineEdit, QTextEdit, QListWidgetItem, QCompleter)
+                             QLineEdit, QTextEdit, QListWidgetItem, QCompleter, QComboBox)
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtCore as QtCore
+
+class CardRank:
+    RANK_LIST = {
+        'NCO': 0,
+        '2LT': 1,
+        '1LT': 2,
+        'CPT': 3,
+        'MAJ': 4,
+        'LTC': 5,
+        'COL': 6,
+        'BG': 7,
+        'RADM': 8,
+        'VADM': 9,
+        'ADM': 10,
+        'SADM': 11,
+        'SD': 12
+    }
+
+    def valid_deck_leader_ranks():
+        return RANK_LIST
 
 DECK_SIZE = 40
 STARTER_DECK_OFFSET = 0x2A0A70
@@ -134,16 +154,11 @@ class DeckEditorMainWindow(QMainWindow):
         self.statusbar.clearMessage()
         if current is not None and self.deck_data is not None:
             try:
-                leader, rank = self.lineedit_leader.text(), self.lineedit_leader_rank.text()
+                leader, rank = self.lineedit_leader.text(), CardRank.RANK_LIST[self.combobox_leader_rank.currentText()]
+
+                print('blair currentText', self.combobox_leader_rank.currentText(), CardRank.RANK_LIST[self.combobox_leader_rank.currentText()])
 
                 deck_data = []
-
-                if rank.isnumeric():
-                    rank = int(rank)
-                else:
-                    self.statusbar.showMessage("Rank is not numeric")
-                    return
-
 
                 if leader.isnumeric():
                     leaderdata = (int(leader) & 0xFFF) | ((rank & 0xF) << 12)
@@ -227,7 +242,7 @@ class DeckEditorMainWindow(QMainWindow):
                 leader_card = leader & 0xFFF
 
                 self.lineedit_leader.setText(get_name(leader_card))
-                self.lineedit_leader_rank.setText(str(rank))
+                self.combobox_leader_rank.setCurrentIndex(rank)
 
                 for i in range(DECK_SIZE):
                     card = struct.unpack_from("H", self.deck_data, current.number*41*2 + 2 + i*2)[0] & 0xFFF
@@ -339,9 +354,11 @@ class DeckEditorMainWindow(QMainWindow):
         self.leader_rank_layout_widget = QWidget(self.centralwidget)
         self.leader_rank_layout = QHBoxLayout(self.leader_rank_layout_widget)
         self.leader_rank_label = QLabel('Deck Leader Rank:')
-        self.lineedit_leader_rank = QLineEdit(self.leader_rank_layout_widget)
+        self.combobox_leader_rank = QComboBox (self.leader_rank_layout_widget)
+        self.combobox_leader_rank.addItems(list(CardRank.RANK_LIST.keys()))
+
         self.leader_rank_layout.addWidget(self.leader_rank_label)
-        self.leader_rank_layout.addWidget(self.lineedit_leader_rank)
+        self.leader_rank_layout.addWidget(self.combobox_leader_rank)
 
         # Row 4
         self.cards_scroll = QScrollArea(self.centralwidget)
