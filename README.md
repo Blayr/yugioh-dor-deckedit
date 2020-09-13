@@ -12,3 +12,5 @@ Below are the card IDs for the remaining 40 cards in the deck.
 For the card ID you can either type in the numeric value, or a part of the card name.
 The tool will attempt to autocomplete the card name, but will tell you if there are
 too many cards matching your name.
+
+This depends on QT for python (https://doc.qt.io/qtforpython/). This project includes a .spec to compile into a.exe for windows. Install pyinstaller and simply run "pyinstaller yugioh_cards_edit.spec"
